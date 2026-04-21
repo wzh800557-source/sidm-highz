@@ -91,7 +91,3 @@ python analysis/generate_figures.py
 ## License
 
 MIT License. See LICENSE file.
-# sidm-highz
-# sidm-highz
-# sidm-highz
-# sidm-highz
