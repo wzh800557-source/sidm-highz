@@ -75,18 +75,7 @@ python analysis/generate_figures.py
 - scipy ≥ 1.7
 - matplotlib ≥ 3.5
 
-## Citation
 
-```bibtex
-@article{Wang2026sidm_uvlf,
-    author = {Wang, Zihan and Vogelsberger, Mark},
-    title = {Complementary constraints on self-interacting dark matter
-             from reionization topology and the $z > 9$ UV luminosity function},
-    journal = {Physical Review D},
-    year = {2026},
-    note = {in preparation}
-}
-```
 
 ## License
 
