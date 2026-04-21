@@ -3,7 +3,7 @@
 Code and data accompanying:
 
 **"Complementary constraints on self-interacting dark matter from reionization topology and the z > 9 UV luminosity function"**
-Wang & Vogelsberger (2026)
+Wang & Shan (2026)
 
 ## Summary
 
