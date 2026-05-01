@@ -1,82 +1,122 @@
-# SIDM constraints from reionization topology and the JWST UV luminosity function
+# SIDM at High Redshift: Simulation Grid and Reionization Analysis
 
-Code and data accompanying:
+Code and data for a series of studies connecting self-interacting dark matter (SIDM) microphysics to reionization-era observables:
 
-**"Complementary constraints on self-interacting dark matter from reionization topology and the z > 9 UV luminosity function"**
-Wang & Shan (2026)
+- *Reionization Topology as a Probe of Self-Interacting Dark Matter* (Wang 2026) [[arXiv:2604.10726]](https://arxiv.org/abs/2604.10726)
+- *Breaking the UV Luminosity Function Degeneracy: SIDM Constraints from Reionization Topology* (Wang & Shan 2026) [[arXiv:2604.19726]](https://arxiv.org/abs/2604.19726)
+- *The escape fraction degeneracy: a fundamental barrier to constraining dark matter from the epoch of reionization* (Wang & Shan 2026)
 
-## Summary
-
-Self-interacting dark matter (SIDM) core formation reduces the gas binding energy in high-redshift halos, producing two observable effects through independent physical channels:
-
-1. **Increased duty cycle** of ionizing-photon escape → enhanced 21 cm reionization topology
-2. **Decreased star formation efficiency** → suppressed UV luminosity function at z > 9
-
-We show that the UVLF alone **cannot** constrain SIDM (astrophysical parameters absorb the signal in a profile likelihood), but the topology provides an independent constraint that is immune to this degeneracy. Together, the two probes constrain SIDM across the full (σ/m, η) parameter space.
+All studies use the same 230-run GIZMO N-body simulation grid spanning 5 halo masses, 7 cross-sections, 4 redshifts, plus 90 velocity-dependent Yukawa runs.
 
 ## Repository structure
 
-```
-sidm_uvlf_code/
-├── analysis/
-│   ├── uvlf_sidm.py          # Core UVLF model: HMF, SFE, SIDM modification, likelihood
-│   ├── generate_figures.py    # Reproduce all 7 paper figures
-│   └── joint_constraint.py    # Joint UVLF + topology analysis
-├── cluster/
-│   ├── run_profile_scan.py    # Self-contained profile likelihood scan (252 grid points)
-│   ├── submit_profile.sh      # SLURM submission script (MIT Engaging)
-│   └── quick_test.sh          # Reduced grid for local testing
-├── data/
-│   ├── profile_scan_results.json   # Full scan output (18×14 grid)
-│   └── uvlf_data_verified.json    # 31 JWST data points (Donnan+2024, Harikane+2024)
-├── figures/
-│   └── fig[1-7]_*.pdf         # Publication figures
-├── docs/
-│   └── eta_calibration.md     # η calibration literature survey
-├── README.md
-├── LICENSE
-└── requirements.txt
-```
+    sidm-highz/
+    ├── analysis/                     UVLF profile likelihood
+    │   ├── uvlf_sidm.py             Core UVLF model, HMF, SFE, likelihood
+    │   ├── generate_figures.py       Figure generation
+    │   └── joint_constraint.py       Joint UVLF + topology analysis
+    ├── cluster/                      Cluster job scripts
+    │   ├── run_profile_scan.py       252-point profile scan
+    │   ├── submit_profile.sh         SLURM script (MIT Engaging)
+    │   └── quick_test.sh             Reduced grid for local testing
+    ├── fesc_degeneracy/              Escape fraction degeneracy analysis
+    │   ├── scripts/
+    │   │   ├── reionization_optimizer.py   Profile likelihood for f_esc x f_star
+    │   │   ├── extract_dbind.py            Binding energy from GIZMO snapshots
+    │   │   └── generate_ics.py             NFW IC generator (galpy)
+    │   └── figures/
+    ├── data/                         Shared data
+    │   ├── dbind_table.json          Delta_bind grid (210 entries, 5 radii)
+    │   ├── dbind_table.csv           Same in CSV format
+    │   ├── profile_scan_results.json UVLF scan output (252 points)
+    │   └── uvlf_data_verified.json   31 JWST UVLF data points
+    ├── figures/                      UVLF analysis figures
+    ├── docs/
+    │   └── eta_calibration.md        eta calibration literature survey
+    ├── README.md
+    ├── LICENSE
+    └── requirements.txt
 
 ## Quick start
 
 ```bash
-# Install dependencies
 pip install numpy scipy matplotlib
 
-# Run the CDM baseline fit
+# UVLF profile scan
 python analysis/uvlf_sidm.py
 
-# Run a quick profile scan (35 points, ~20 min)
-cd cluster && bash quick_test.sh
+# Escape fraction degeneracy (should print Delta_chi2 = 0 at all 9 points)
+python fesc_degeneracy/scripts/reionization_optimizer.py --scan --data data/dbind_table.json
 
-# Generate all figures from existing results
-python analysis/generate_figures.py
+# With blowout correlation
+python fesc_degeneracy/scripts/reionization_optimizer.py --scan --data data/dbind_table.json --alpha_esc 0.3 --sigma_fesc 0.03
+```
+
+## Simulation grid
+
+| Parameter | Values | Count |
+|-----------|--------|-------|
+| Halo mass | 10^9, 10^9.5, 10^10, 10^10.5, 10^11 M_sun | 5 |
+| sigma/m (constant) | 0, 0.5, 1, 2, 5, 10, 20 cm^2/g | 7 |
+| Redshift | 0, 4, 7, 10 | 4 |
+| **Constant-sigma total** | | **140** |
+| sigma_0/m (Yukawa) | 1, 3, 10 cm^2/g | 3 |
+| w (Yukawa scale) | 50, 100, 200 km/s | 3 |
+| Redshift (Yukawa) | 4, 7 | 2 |
+| **Yukawa total** | | **90** |
+| **Grand total** | | **230** |
+
+All simulations use GIZMO with N = 500,000 particles per halo, evolved for 0.5 Gyr. Concentrations follow Dutton & Maccio (2014). Initial conditions from galpy Eddington inversion.
+
+## Data format
+
+Key naming: `M{MMM}_z{Z}_s{SSSS}_{type}`
+
+- `MMM`: Mass code (090 = 10^9.0, 095 = 10^9.5, 100 = 10^10.0, 105 = 10^10.5, 110 = 10^11.0)
+- `Z`: Redshift (0, 4, 7, 10)
+- `SSSS`: Cross-section code (0005 = 0.5, 0010 = 1, 0020 = 2, 0050 = 5, 0100 = 10, 0200 = 20)
+- `type`: `const` for constant cross-section; for Yukawa add `_w{WWW}_vd`
+
+```python
+import json
+with open('data/dbind_table.json') as f:
+    grid = json.load(f)
+
+entry = grid['M100_z7_s0100_const']
+# entry['R_kpc']      = [0.3, 0.5, 1.0, 2.0, 5.0]
+# entry['delta_bind'] = [0.90, 0.72, 0.28, -0.06, ...]
+# Delta_bind = 1 - W_g^SIDM / W_g^CDM
 ```
 
 ## Key results
 
-| η range | UVLF+SMF limit | Topology (SKA 10% floor) | Joint |
-|---------|---------------|-------------------------|-------|
-| ≥ 0.25  | σ/m < 0.3     | σ/m > 2.3 detectable    | Both reject σ/m ≥ 2.3 |
-| 0.07–0.25 | σ/m < 0.3–2.4 | σ/m > 2.3 detectable | SKA target window |
-| ≲ 0.07  | None          | σ/m > 2.3 detectable    | Topology only |
+### UVLF degeneracy
 
-## Data sources
+The UVLF alone cannot constrain SIDM: Delta_chi2 drops from ~3000 to < 0.21 across 252 grid points when astrophysical parameters are profiled.
 
-- **UVLF:** Donnan et al. (2024, arXiv:2403.03171) Table 2; Harikane et al. (2024, arXiv:2406.18352) Table 2
-- **SMF prior:** Weibel et al. (2024), JWST PRIMER
-- **Topology:** Wang & Vogelsberger (2026, arXiv:2604.10726), Paper I
+### Escape fraction degeneracy
 
-## Requirements
+The product f_esc x f_star renders all reionization-history probes (tau, x_HI, Lya LF, QSO proximity zones) collectively blind to SIDM. Only the 21 cm topology, which depends on the duty cycle per halo at fixed x_HI, breaks this degeneracy.
 
-- Python ≥ 3.8
-- numpy ≥ 1.20
-- scipy ≥ 1.7
-- matplotlib ≥ 3.5
+| Configuration | Excluded (of 9) |
+|---------------|-----------------|
+| UVLF alone | 0/9 |
+| + tau + x_HI (product degeneracy) | 0/9 |
+| + f_esc prior + blowout correlation | 5/9 |
+| 21 cm topology | 9/9 |
+
+## Citation
 
 
 
 ## License
 
-MIT License. See LICENSE file.
+MIT License. See [LICENSE](LICENSE).
+
+## Contact
+
+Zihan Wang — zihan.wang@queens.ox.ac.uk
+
+
+
+
