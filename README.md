@@ -4,8 +4,8 @@ Code and data for a series of studies connecting self-interacting dark matter (S
 
 - *Reionization Topology as a Probe of Self-Interacting Dark Matter* (Wang 2026) [[arXiv:2604.10726]](https://arxiv.org/abs/2604.10726)
 - *Breaking the UV Luminosity Function Degeneracy: SIDM Constraints from Reionization Topology* (Wang & Shan 2026) [[arXiv:2604.19726]](https://arxiv.org/abs/2604.19726)
-- *The escape fraction degeneracy: a fundamental barrier to constraining dark matter from the epoch of reionization* (Wang & Shan 2026)
-
+- *The escape fraction degeneracy: a fundamental barrier to constraining dark matter from the epoch of reionization* 
+[[arXiv:2605.01380]](https://arxiv.org/abs/2605.01380)
 All studies use the same 230-run GIZMO N-body simulation grid spanning 5 halo masses, 7 cross-sections, 4 redshifts, plus 90 velocity-dependent Yukawa runs.
 
 ## Repository structure
@@ -105,7 +105,6 @@ The product f_esc x f_star renders all reionization-history probes (tau, x_HI, L
 | + f_esc prior + blowout correlation | 5/9 |
 | 21 cm topology | 9/9 |
 
-## Citation
 
 
 
