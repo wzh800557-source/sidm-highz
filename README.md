@@ -4,8 +4,8 @@ Code and data for a series of studies connecting self-interacting dark matter (S
 
 - *Reionization Topology as a Probe of Self-Interacting Dark Matter* (Wang 2026) [[arXiv:2604.10726]](https://arxiv.org/abs/2604.10726)
 - *Breaking the UV Luminosity Function Degeneracy: SIDM Constraints from Reionization Topology* (Wang & Shan 2026) [[arXiv:2604.19726]](https://arxiv.org/abs/2604.19726)
-- *The escape fraction degeneracy: a fundamental barrier to constraining dark matter from the epoch of reionization* 
-[[arXiv:2605.01380]](https://arxiv.org/abs/2605.01380)
+- *A Structural Degeneracy Explains Reionization Tensions and Limits Dark Matter Constraints* (Wang & Shan 2026, **accepted, ApJL**) [[arXiv:2605.01380]](https://arxiv.org/abs/2605.01380)
+
 All studies use the same 230-run GIZMO N-body simulation grid spanning 5 halo masses, 7 cross-sections, 4 redshifts, plus 90 velocity-dependent Yukawa runs.
 
 ## Repository structure
@@ -21,15 +21,30 @@ All studies use the same 230-run GIZMO N-body simulation grid spanning 5 halo ma
     │   └── quick_test.sh             Reduced grid for local testing
     ├── fesc_degeneracy/              Escape fraction degeneracy analysis
     │   ├── scripts/
-    │   │   ├── reionization_optimizer.py   Profile likelihood for f_esc x f_star
-    │   │   ├── extract_dbind.py            Binding energy from GIZMO snapshots
-    │   │   └── generate_ics.py             NFW IC generator (galpy)
+    │   │   ├── reionization_optimizer.py     Original optimizer (SUPERSEDED: unit bug, see v2)
+    │   │   ├── reionization_optimizer_v2.py  Corrected profile likelihood (published data vector)
+    │   │   ├── rerun_A_published.py          Full-integral reionization scan (Table 4 / dchi2 <= 0.62)
+    │   │   ├── rerun_A_asym.py               Symmetrised-error robustness check
+    │   │   ├── core.py                       Semi-numerical reionization pipeline (density, fcoll, xi, dTb, V2)
+    │   │   ├── v2_formscan.py                V2 topology functional-form scan (5 forms, 128^3/256^3)
+    │   │   ├── topo_forecast.py              Field-level beta0 SKA1-Low forecast (mock obs + noise MC)
+    │   │   ├── make_fig_per_probe_v3.py      Figure 3 (per-probe sensitivity)
+    │   │   ├── make_fig_joint_v3.py          Figure 4 (joint constraints + forecast)
+    │   │   ├── make_fig_three_panel.py       Figure 1 (degeneracy panels)
+    │   │   ├── extract_dbind.py              Binding energy from GIZMO snapshots
+    │   │   └── generate_ics.py               NFW IC generator (galpy)
     │   └── figures/
     ├── data/                         Shared data
     │   ├── dbind_table.json          Delta_bind grid (210 entries, 5 radii)
     │   ├── dbind_table.csv           Same in CSV format
     │   ├── profile_scan_results.json UVLF scan output (252 points)
-    │   └── uvlf_data_verified.json   31 JWST UVLF data points
+    │   ├── uvlf_data_verified.json   31 JWST UVLF data points
+    │   ├── rerun_A_published_vector_results.json  Reionization scan vs published xHI + tau
+    │   ├── v2_formscan_results.json               V2 form scan, 128^3 (3 seeds x 5 forms)
+    │   ├── v2_formscan_256_results.json           V2 form scan, 256^3 production
+    │   ├── topo_forecast_128_results.json         beta0 forecast, 128^3
+    │   ├── topo_forecast_256_results.json         beta0 forecast, 256^3 production
+    │   └── panelb_chi2.json                       Fig 1b chi2 surface
     ├── figures/                      UVLF analysis figures
     ├── docs/
     │   └── eta_calibration.md        eta calibration literature survey
@@ -45,12 +60,21 @@ pip install numpy scipy matplotlib
 # UVLF profile scan
 python analysis/uvlf_sidm.py
 
-# Escape fraction degeneracy (should print Delta_chi2 = 0 at all 9 points)
-python fesc_degeneracy/scripts/reionization_optimizer.py --scan --data data/dbind_table.json
+# Product-degeneracy scan (f_esc and f_star both profiled): prints
+# near-exact cancellation, max |Delta_chi2| ~ 0.005
+python fesc_degeneracy/scripts/reionization_optimizer_v2.py --scan --data data/dbind_table.json
 
-# With blowout correlation
-python fesc_degeneracy/scripts/reionization_optimizer.py --scan --data data/dbind_table.json --alpha_esc 0.3 --sigma_fesc 0.03
+# Full-integral reionization scan (UVLF-profiled f_star, f_esc profiled
+# against the published tau + xHI(z) vector): Delta_chi2 <= 0.62 at all
+# 9 grid points (paper Table 4; ~minutes)
+python fesc_degeneracy/scripts/rerun_A_published.py
 ```
+
+Note: `reionization_optimizer.py` (v1) is retained for provenance but is
+superseded — it contained a unit error in the ionization ODE that made
+Delta_chi2 exactly zero by construction. `reionization_optimizer_v2.py`
+fixes the units, recalibrates the emissivity, and uses the exact published
+data vector (Umeda+24; Mason+26; Greig+17; Mason+19) quoted in the paper.
 
 ## Simulation grid
 
@@ -94,19 +118,52 @@ entry = grid['M100_z7_s0100_const']
 
 The UVLF alone cannot constrain SIDM: Delta_chi2 drops from ~3000 to < 0.21 across 252 grid points when astrophysical parameters are profiled.
 
-### Escape fraction degeneracy
+### Joint dark-matter–galaxy degeneracy (accepted paper)
 
-The product f_esc x f_star renders all reionization-history probes (tau, x_HI, Lya LF, QSO proximity zones) collectively blind to SIDM. Only the 21 cm topology, which depends on the duty cycle per halo at fixed x_HI, breaks this degeneracy.
+At fixed dark matter parameters the ionizing photon rate is separable,
+n_ion ∝ f_esc × f_star,0, so emissivity-based probes constrain only the
+product. Once the dark matter parameters vary, re-matching the observed
+UVLF also restores the ionizing emissivity to within a few per cent
+(the same haloes dominate both), producing a joint
+dark-matter–f_star,0–f_esc degeneracy. Confronted with the published
+tau + xHI(z) compilation, the profiled Delta_chi2 stays <= 0.62 at every
+grid point:
 
-| Configuration | Excluded (of 9) |
-|---------------|-----------------|
+| Probe (current data, f_esc profiled) | Excluded (of 9) |
+|---------------------------------------|-----------------|
 | UVLF alone | 0/9 |
-| + tau + x_HI (product degeneracy) | 0/9 |
-| + f_esc prior + blowout correlation | 5/9 |
-| 21 cm topology | 9/9 |
+| + tau + x_HI (published compilation) | 0/9 |
+| + f_esc prior + blowout correlation | 0/9 (reabsorbed by profiling) |
+
+### SKA1-Low forecasts (two-pointing mosaic, times per pointing)
+
+| Channel | 1000 h | 5000 h |
+|---------|--------|--------|
+| P21(k), 5-sigma threshold (optimistic foregrounds) | sigma/m ≈ 2 cm²/g | sigma/m ≈ 1.2 cm²/g |
+| beta0 field-level topology (sigma/m = 10) | 2.0 sigma | 4.1 sigma |
+| beta0 (moderate wedge, any sigma/m) | < 0.8 sigma | < 0.8 sigma |
+
+The V2 (Euler characteristic) contrast is +18% ± 1% at 256^3 (three
+seeds), stable at +15% to +18% across five alternative functional forms
+of the emissivity modification (v2_formscan_256_results.json).
 
 
 
+
+## Citation
+
+If you use this code or data, please cite:
+
+```bibtex
+@article{WangShan2026,
+  author  = {{Wang}, Zihan and {Shan}, Huanyuan},
+  title   = {A Structural Degeneracy Explains Reionization Tensions and
+             Limits Dark Matter Constraints},
+  journal = {The Astrophysical Journal Letters},
+  year    = {2026},
+  note    = {accepted; arXiv:2605.01380}
+}
+```
 
 ## License
 

@@ -1,0 +1,49 @@
+{
+ "config": {
+  "grid": 256,
+  "box": 200.0,
+  "z": 7.0,
+  "SUPP_AMP": 0.35,
+  "dbind_sidm10": 0.72,
+  "R0": 4.0,
+  "core": "~/sidm-highz/referee_rev/core.py (production)",
+  "slurm_job": 18242482,
+  "log": "/orcd/scratch/orcd/009/wzh557/v2form/v2form_256_final.log"
+ },
+ "seed42": {
+  "cdm_EC": 1.26,
+  "gauss": 18.6,
+  "exp": 14.6,
+  "lorentz": 16.8,
+  "tanh": 18.4,
+  "linear": 15.3
+ },
+ "seed43": {
+  "cdm_EC": 1.2733,
+  "gauss": 17.6,
+  "exp": 14.8,
+  "lorentz": 15.9,
+  "tanh": 17.7,
+  "linear": 14.5
+ },
+ "seed44": {
+  "cdm_EC": 1.2684,
+  "gauss": 18.4,
+  "exp": 14.7,
+  "lorentz": 16.6,
+  "tanh": 18.1,
+  "linear": 15.2
+ },
+ "seed_means_pct": {
+  "gauss": 18.2,
+  "exp": 14.7,
+  "lorentz": 16.4,
+  "tanh": 18.1,
+  "linear": 15.0
+ },
+ "range_pct": [
+  14.5,
+  18.6
+ ],
+ "note": "dV2 = EC_SIDM/EC_CDM - 1 at x_ion=0.5; fiducial (gauss) mean +18.2% matches manuscript +18%+-1%"
+}

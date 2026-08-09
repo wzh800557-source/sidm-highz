@@ -1,0 +1,81 @@
+{
+ "config": {
+  "grid": 256,
+  "seeds": [
+   42,
+   43,
+   44
+  ],
+  "nnoise": 8,
+  "RS_Mpch": 2.0,
+  "estimator": "beta0 threshold curve (30-70 pct), smoothed, below-threshold regions",
+  "noise": "anisotropic thermal (App G uv model) + wedge scenarios; no eps_sys",
+  "slurm_job": 18247251,
+  "runtime_min": 62,
+  "full_results": "/orcd/scratch/orcd/009/wzh557/v2form/topo_forecast_256_results.json"
+ },
+ "significance_sigma": {
+  "optimistic_1000h": {
+   "sidm1": 0.5,
+   "sidm5": 1.7,
+   "sidm10": 2.2
+  },
+  "optimistic_5000h": {
+   "sidm1": 1.3,
+   "sidm5": 4.5,
+   "sidm10": 6.1
+  },
+  "moderate_1000h": {
+   "sidm1": 0.3,
+   "sidm5": 0.9,
+   "sidm10": 1.0
+  },
+  "moderate_5000h": {
+   "sidm1": 0.4,
+   "sidm5": 1.1,
+   "sidm10": 1.1
+  },
+  "DEPRECATED_note": "quadrature-sum values superseded by fullcov_hartlap"
+ },
+ "sanity": {
+  "128_3_comparison": "3.4/2.5/0.7 (1000h opt) and 8.6/6.2/1.8 (5000h opt): finer resolution lowers the count-statistic significance; 256^3 quoted as production"
+ },
+ "significance_sigma_fullcov_hartlap": {
+  "note": "S^2 = h dmu^T (C_S+C_C)^{-1} dmu, h=(48-5-2)/47=0.87; production numbers quoted in paper",
+  "optimistic_1000h": {
+   "sidm1": 0.5,
+   "sidm5": 1.6,
+   "sidm10": 2.2
+  },
+  "optimistic_5000h": {
+   "sidm1": 1.1,
+   "sidm5": 3.1,
+   "sidm10": 4.4
+  },
+  "moderate_1000h": {
+   "sidm1": 0.4,
+   "sidm5": 0.6,
+   "sidm10": 0.6
+  },
+  "moderate_5000h": {
+   "sidm1": 0.3,
+   "sidm5": 0.8,
+   "sidm10": 0.9
+  }
+ },
+ "significance_sigma_fullcov_hartlap_conservative": {
+  "note": "FINAL quoted numbers: h=(24-5-2)/(24-1)=0.739 (per-model n=24, conservative); rescale factor 0.9205 from the n_tot=48 values",
+  "optimistic_1000h_per_pointing": {
+   "sidm1": 0.5,
+   "sidm5": 1.5,
+   "sidm10": 2.0
+  },
+  "optimistic_5000h_per_pointing": {
+   "sidm1": 1.0,
+   "sidm5": 2.9,
+   "sidm10": 4.1
+  },
+  "moderate": "<=0.8 sigma everywhere",
+  "geometry": "two-pointing mosaic, 10 deg^2 total; t_obs per pointing"
+ }
+}

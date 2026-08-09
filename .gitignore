@@ -1,0 +1,8 @@
+.DS_Store
+__pycache__/
+*.pyc
+# working documents not part of the public release
+REVISION_STATUS.md
+response_round2/
+session_recovery/
+fesc_degeneracy/figures/fig_three_panel_v2.pdf
