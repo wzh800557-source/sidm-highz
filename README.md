@@ -150,19 +150,7 @@ of the emissivity modification (v2_formscan_256_results.json).
 
 
 
-## Citation
 
-If you use this code or data, please cite:
-
-```bibtex
-@article{WangShan2026,
-  author  = {{Wang}, Zihan and {Shan}, Huanyuan},
-  title   = {A Structural Degeneracy Explains Reionization Tensions and
-             Limits Dark Matter Constraints},
-  journal = {The Astrophysical Journal Letters},
-  year    = {2026},
-  note    = {accepted; arXiv:2605.01380}
-}
 ```
 
 ## License
